@@ -1,0 +1,25 @@
+{
+  "name": "gulp-webpack-config",
+  "version": "0.0.1",
+  "description": "Gulp plugin to run webpack on a stream of config file and wrap the results in a vinyl file",
+  "keywords": [
+    "gulpplugin",
+    "wrap",
+    "webpack"
+  ],
+  "main": "index.coffee",
+  "license": "MIT",
+  "author": "Kevin Malakoff (https://github.com/kmalakoff)",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kmalakoff/gulp-wrap-amd-infer.git"
+  },
+  "engines": {
+    "node": ">=0.8.0"
+  },
+  "dependencies": {
+    "coffee-script": "*",
+    "event-stream": "*",
+    "webpack": "*"
+  }
+}
