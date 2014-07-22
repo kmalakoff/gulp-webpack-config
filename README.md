@@ -22,6 +22,15 @@ gulp.task 'build', ->
     .pipe(gulp.dest('.')
 ```
 
+### Note
+
+1. if you do not specify an output filename, it will infer it from the file passed using the following conventions:
+
+- filename.js -> filename.js
+- filename.config.js -> filename.js
+- filename.webpack.config.js -> filename.js
+- filename.webpack.config.coffee -> filename.js
+
 ### Options
 
-- pure (boolean) - false if you do not want to automatically delete the file after webpacking. Useful if you do not want a pure file-based approach.
+1. pure (boolean) - false if you do not want to automatically delete the file after webpacking. Useful if you do not want a pure file-based approach.

@@ -12,6 +12,11 @@ debounceCallback = (callback) ->
 
 module.exports = (options={}) -> es.map (file, callback) ->
   try config = require(file.path) catch err then return callback(err)
+  unless config.output?.filename
+    (config.output or= {}).filename = path.basename(file.path)
+    config.output.filename = config.output.filename.replace(path.extname(config.output.filename), '.js')
+    config.output.filename = config.output.filename.replace('.webpack.config', '')
+    config.output.filename = config.output.filename.replace('.config', '')
 
   webpack config, (err, stats) ->
     return callback(err) if err
