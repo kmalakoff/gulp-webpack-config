@@ -19,5 +19,9 @@ gulp.task 'build', ->
   gulp.src('config/builds/library/**/*.webpack.config.coffee', {read: false, buffer: false})
     .pipe(webpack())
     .pipe(header(HEADER, {pkg: require('./package.json')}))
-    .pipe(gulp.dest((file) -> file.base))
+    .pipe(gulp.dest('.')
 ```
+
+### Options
+
+- pure (boolean) - false if you do not want to automatically delete the file after webpacking. Useful if you do not want a pure file-based approach.
