@@ -10,6 +10,14 @@ debounceCallback = (callback) ->
   debounced_callback = -> return if debounced_callback.was_called; debounced_callback.was_called = true; callback.apply(null, Array.prototype.slice.call(arguments, 0))
   return debounced_callback
 
+getFile = (file, callback) ->
+  return callback(null, file) if file.pipe
+  vinyl.src(file)
+    .pipe es.writeArray (err, files) ->
+      return callback(err) if err
+      return callback(new Error "Expecting one file for #{file}. Found #{files.length}") if files.length is 0 or files.length > 1
+      callback(null, files[0])
+
 module.exports = (options={}) -> es.map (file, callback) ->
   try config = require(file.path) catch err then return callback(err)
   unless config.output?.filename
@@ -23,14 +31,8 @@ module.exports = (options={}) -> es.map (file, callback) ->
     gutil.log stats.toString({})
     return callback(new Error "Webpack had #{stats.compilation.errors.length} errors") if stats.compilation.errors.length and options.errors
 
-    # always delete the generated file (only once)
+    # always delete the generated file
     file_path = path.resolve(path.join(config.output.path, config.output.filename))
-    done = debounceCallback (err, file) ->
+    getFile file_path, (err, file) ->
       return callback(err, file) if options.hasOwnProperty('pure') and not option.pure
       fs.unlink file_path, -> callback(err, file)
-
-    # create a file
-    vinyl.src(file_path, options)
-      .pipe(es.map (file, callback) -> done(null, file); callback())
-      .on('error', done)
-      .on('finish', -> done(new Error "Failed to read #{file_path}"))
