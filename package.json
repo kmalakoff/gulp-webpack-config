@@ -1,6 +1,6 @@
 {
   "name": "gulp-webpack-config",
-  "version": "0.1.2",
+  "version": "0.1.3",
   "description": "Gulp plugin to run webpack on a stream of config file and wrap the results in a vinyl file",
   "keywords": [
     "gulpplugin",
@@ -21,6 +21,7 @@
     "coffee-script": "*",
     "event-stream": "*",
     "webpack": "*",
-    "vinyl-fs": "*"
+    "vinyl-fs": "*",
+    "gulp-util": "*"
   }
 }
