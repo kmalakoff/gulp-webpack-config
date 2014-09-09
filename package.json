@@ -22,6 +22,10 @@
     "event-stream": "*",
     "webpack": "*",
     "vinyl-fs": "*",
-    "gulp-util": "*"
+    "gulp-util": "*",
+    "async": "*",
+    "through2": "*",
+    "rimraf": "*",
+    "clone": "*"
   }
 }
