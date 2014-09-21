@@ -6,6 +6,7 @@ es = require 'event-stream'
 through2 = require 'through2'
 rimraf = require 'rimraf'
 clone = require 'clone'
+Async = require 'async'
 
 webpack = require 'webpack'
 gutil = require 'gulp-util'
@@ -25,9 +26,10 @@ module.exports = (options={}) -> through2.obj (file, enc, callback) ->
     gutil.log stats.toString({})
     return callback(new Error "Webpack had #{stats.compilation.errors.length} errors") if stats.compilation.errors.length and options.errors
 
-    vinyl.src((path.resolve(path.join(config.output.path, key)) for key of stats.compilation.assets))
+    file_paths = (path.resolve(path.join(config.output.path, key)) for key of stats.compilation.assets)
+    vinyl.src(file_paths)
       .pipe es.writeArray (err, files) =>
         if err then gutil.log(err)
         else
           @push(file) for file in files
-        if temp_folder then rimraf(temp_folder, callback) else callback()
+        if temp_folder then rimraf(temp_folder, callback) else Async.each(file_paths, rimraf, callback)
