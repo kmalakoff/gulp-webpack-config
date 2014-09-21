@@ -1,5 +1,6 @@
 fs = require 'fs'
 path = require 'path'
+_ = require 'underscore'
 crypto = require 'crypto'
 es = require 'event-stream'
 through2 = require 'through2'
@@ -26,8 +27,7 @@ module.exports = (options={}) -> through2.obj (file, enc, callback) ->
 
     vinyl.src((path.resolve(path.join(config.output.path, key)) for key of stats.compilation.assets))
       .pipe es.writeArray (err, files) =>
-        (gutil.log(err); return @push()) if err
-
-        @push(file) for file in files
-        @push()
-        rimraf temp_folder, callback
+        if err then gutil.log(err)
+        else
+          @push(file) for file in files
+        if temp_folder then rimraf(temp_folder, callback) else callback()
