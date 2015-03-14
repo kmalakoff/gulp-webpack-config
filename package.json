@@ -1,6 +1,6 @@
 {
   "name": "gulp-webpack-config",
-  "version": "0.1.5",
+  "version": "0.1.6",
   "description": "Gulp plugin to run webpack on a stream of config file and wrap the results in a vinyl file",
   "keywords": [
     "gulpplugin",
@@ -26,6 +26,6 @@
     "async": "*",
     "through2": "*",
     "rimraf": "*",
-    "clone": "*"
+    "clone": "0.1.x"
   }
 }
