@@ -17,7 +17,6 @@ module.exports = (options={}) -> through2.obj (file, enc, callback) ->
   config = clone(config)
   unless config.output?.filename
     config.output =
-      root: '.'
       path: (temp_folder = crypto.rng(16).toString('hex'))
       filename: '[name].js'
 
