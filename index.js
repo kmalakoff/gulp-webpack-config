@@ -1,7 +1,6 @@
 const fs = require('fs');
 const path = require('path');
 const _ = require('underscore');
-const crypto = require('crypto');
 const es = require('event-stream');
 const through2 = require('through2');
 const rimraf = require('rimraf');
@@ -16,18 +15,12 @@ module.exports = function (options) {
   if (options == null) options = {};
   
   return through2.obj(function (file, enc, callback) {
-    let config, temp_folder;
-    try {
-      config = require(file.path);
+    let config;
+    try { config = require(file.path);
     } catch (error) { return callback(error); }
 
     config = clone(config);
-    if (!(config.output != null ? config.output.filename : undefined)) {
-      config.output = {
-        path: (temp_folder = crypto.rng(16).toString('hex')),
-        filename: '[name].js'
-      };
-    }
+    if (!config.output || config.output.filename) config.output = { filename: '[name].js' };
 
     return webpack(config, (err, stats) => {
       if (err) return callback(err);
@@ -48,12 +41,9 @@ module.exports = function (options) {
       return vinyl.src(file_paths)
         .pipe(es.writeArray((err, files) => {
           if (err) gutil.log(err);
-          else {
-            for (file of files) this.push(file);
-          }
+          else { for (file of files) this.push(file); }
 
-          if (temp_folder) return rimraf(temp_folder, callback);
-          else return Async.each(file_paths, rimraf, callback);
+          return Async.each(file_paths, rimraf, callback);
         }));
     });
   });
