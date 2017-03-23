@@ -1,11 +1,10 @@
 const fs = require('fs');
 const path = require('path');
-const _ = require('underscore');
+const crypto = require('crypto');
 const es = require('event-stream');
 const through2 = require('through2');
 const rimraf = require('rimraf');
 const clone = require('clone');
-const Async = require('async');
 
 const webpack = require('webpack');
 const gutil = require('gulp-util');
@@ -16,11 +15,16 @@ module.exports = function (options) {
   
   return through2.obj(function (file, enc, callback) {
     let config;
-    try { config = require(file.path);
-    } catch (error) { return callback(error); }
+    try { config = clone(require(file.path)); }
+    catch (error) { return callback(error); }
 
-    config = clone(config);
-    if (!config.output || config.output.filename) config.output = { filename: '[name].js' };
+    const temp_folder = path.join(__dirname, crypto.rng(16).toString('hex'));
+    if (!(config.output != null ? config.output.filename : undefined)) {
+      config.output = {
+        path: temp_folder,
+        filename: '[name].js'
+      };
+    }
 
     return webpack(config, (err, stats) => {
       if (err) return callback(err);
@@ -30,20 +34,17 @@ module.exports = function (options) {
         return callback(new Error(`Webpack had ${stats.compilation.errors.length} errors`));
       }
 
-      const file_paths = ((() => {
-        const result = [];
-        for (let key in stats.compilation.assets) {
-          result.push(path.resolve(path.join(config.output.path, key)));
-        }
-        return result;
-      })());
+      const file_paths = [];
+      for (let key in stats.compilation.assets) {
+        file_paths.push(path.resolve(path.join(config.output.path, key)));
+      }
 
       return vinyl.src(file_paths)
         .pipe(es.writeArray((err, files) => {
           if (err) gutil.log(err);
           else { for (file of files) this.push(file); }
 
-          return Async.each(file_paths, rimraf, callback);
+          rimraf(temp_folder, callback);
         }));
     });
   });
